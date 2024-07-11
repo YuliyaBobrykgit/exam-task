@@ -33,18 +33,19 @@ const sections = [
 const sectionItemContainer = document.querySelector('.wrapper-for-section-container');
 const templateSection = document.getElementById('section-template');
 
-function addContentToSectionTemplate (item) {
+function addContentToSectionTemplate (arr) {
+    arr.forEach (function (item) {
     const clonedSection = templateSection.content.cloneNode(true);
     clonedSection.querySelector('h3').textContent = item.name;
     clonedSection.querySelector('img').src = item.img;
     clonedSection.querySelector('a').href = item.link;
     clonedSection.firstElementChild.id = item.tag;
     sectionItemContainer.append(clonedSection);
-}
+})}
 
-sections.forEach(addContentToSectionTemplate)
+addContentToSectionTemplate(sections);
 const sortControl = document.querySelector('#sort-items');
-const siteSearch = document.querySelector('.site-search')
+const siteSearch = document.querySelector('.site-search');
 
 
 const items = [
@@ -146,31 +147,31 @@ const items = [
     },
 ]
 
-let currentState = []
-let currentSectionState = []
-let favouriteItems = []
+let currentState = [];
+let currentSectionState = [];
+let favouriteItems = [];
 
 //Items rendering Functionality
 
-const ItemContainer = document.querySelector('.wrapper-for-item-container');
+const itemContainer = document.querySelector('.wrapper-for-item-container');
 const templateItem = document.getElementById('item-template');
 const nothingFound = document.querySelector('#nothing-found');
-const favBtn = document.querySelector('#favourites-btn')
+const favBtn = document.querySelector('#favourites-btn');
 
 
-
-function addContentToItemTemplate (item) {
-    const clonedItem = templateItem.content.cloneNode(true);
+function addContentToItemTemplate (arr) {
+    arr.forEach(function (item) {
+    clonedItem = templateItem.content.cloneNode(true);
     clonedItem.querySelector('img').src = item.img;
     clonedItem.querySelector('h3').textContent = item.name;
-    clonedItem.querySelector('p').textContent = `${item.price[0]}$`;
+    // clonedItem.querySelector('p').textContent = `${item.price[0]}$`;
     clonedItem.querySelector('option[value="big"]').textContent = item.options[0];
     clonedItem.querySelector('option[value="medium"]').textContent = item.options[1];
     clonedItem.querySelector('option[value="small"]').textContent = item.options[2];
-
+    
     const selectedOption = clonedItem.querySelector('#sort-size');
-    const p = clonedItem.querySelector('p')
-
+    const p = clonedItem.querySelector('p');
+    
     selectedOption.addEventListener('change', changePrice)
     function changePrice() {
         if (selectedOption.value ==='big') {
@@ -179,18 +180,21 @@ function addContentToItemTemplate (item) {
         else if (selectedOption.value === 'medium') {
             p.textContent = `${item.price[1]}$`;
         } 
-        else {p.textContent = `${item.price[2]}$`}
+        else {
+            p.textContent = `${item.price[2]}$`;
+        }
     }
     changePrice()
+    
     const favouriteMark = clonedItem.querySelector('i');
     if (favouriteItems.includes(item)) {
-        favouriteMark.classList.add('red-heart')
+        favouriteMark.classList.add('red-heart');
     }
-    favouriteMark.addEventListener('click', handleFavourites)
+    favouriteMark.addEventListener('click', handleFavourites);
     
     function handleFavourites() {
         if (!favouriteItems.includes(item)) {
-            favouriteMark.classList.add('red-heart')
+            favouriteMark.classList.add('red-heart');
             favouriteItems.push(item);
         } else {
             favouriteMark.classList.remove('red-heart')
@@ -200,49 +204,46 @@ function addContentToItemTemplate (item) {
         }
     }
 
-    ItemContainer.append(clonedItem);
-}
+    itemContainer.append(clonedItem);
+})}
 
-
-function renderItems () {
+function renderItems(arr) {
     sectionItemContainer.textContent = '';
-    ItemContainer.textContent = '';
+    itemContainer.textContent = '';
     nothingFound.textContent = '';
     
-    currentState.forEach(addContentToItemTemplate);
+    addContentToItemTemplate(currentState);
 }
 
-
-
 function renderSections () {
-    const sectionContainers = document.querySelectorAll('.section-container')
+    const sectionContainers = document.querySelectorAll('.section-container');
     sectionContainers.forEach (function (sectionContainer) { 
         sectionContainer.addEventListener('click', function openSection (event) {
-            showBackBtn()
+            showBackBtn();
             currentSectionState = items.filter(function (item) {
                 return item.tag === event.currentTarget.id;
             })
             currentState = [...currentSectionState];
-            renderItems ();
+            renderItems (currentState);
             showControls();
-        }
+        }           
     )})
-    hideControls()
+    hideControls();
 }
-renderSections ()
+renderSections ();
 
 function showBackBtn() {
     const previousBackButton = document.querySelector('.back-btn');
     if (previousBackButton) {
         previousBackButton.remove();
     }
-    const backButton = document.createElement('button')
+    const backButton = document.createElement('button');
     backButton.classList.add('back-btn');
     backButton.textContent = 'Назад';
-    sectionItemContainer.before(backButton)
+    sectionItemContainer.before(backButton);
     backButton.addEventListener('click', function goBackToMain () {
-        sections.forEach(addContentToSectionTemplate); 
-        ItemContainer.textContent = '';
+        addContentToSectionTemplate(sections); 
+        itemContainer.textContent = '';
         backButton.classList.add('hidden');
         if (favouriteItems.length) {
             favBtn.classList.remove('hidden');
@@ -261,10 +262,10 @@ const searchButton = document.querySelector('#search-btn');
 function verifyInputText(inputText) {
     inputText = inputField.value;
     currentState = currentSectionState.filter((item) => {
-        return item.name.toLowerCase().includes(inputText.trim().toLowerCase())
+        return item.name.toLowerCase().includes(inputText.trim().toLowerCase());
     })
     sortControl.value = 'default';
-    renderItems();
+    renderItems(currentState);
     if (currentState.length === 0) {
         nothingFound.textContent = 'Ничего не найдено';
     }
@@ -303,7 +304,9 @@ sortControl.addEventListener("change", (event) => {
             break;
         }
     }    
-    renderItems ();
+    
+    renderItems (currentState);
+    
 
 })
 
@@ -321,8 +324,8 @@ function showControls() {
 
 favBtn.addEventListener('click', openFavItems)
 function openFavItems() {
-    showControls()
-    showBackBtn()
-    currentState = [...favouriteItems]
-    renderItems();
+    showControls();
+    showBackBtn();
+    currentState = [...favouriteItems];
+    renderItems(currentState);
 }
